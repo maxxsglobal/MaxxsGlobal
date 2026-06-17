@@ -1,0 +1,11 @@
+# robots.txt for MAXXS GLOBAL
+# https://www.maxxsglobal.com
+
+User-agent: *
+Allow: /
+
+# Block access to any admin or private folders (add if needed)
+# Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://www.maxxsglobal.com/sitemap.xml

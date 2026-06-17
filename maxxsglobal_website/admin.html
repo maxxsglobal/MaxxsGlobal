@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAXXS GLOBAL – Admin Panel</title>
+<!-- Block search engines from indexing admin page -->
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0a1628; --navy-mid:#0d1f3c; --navy-light:#1a3055;
+  --gold:#c9a227; --gold-light:#e6be4a; --orange:#e85d04;
+  --white:#ffffff; --gray:#94a3b8; --gray-light:#e2e8f0;
+  --green:#22c55e; --red:#ef4444;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Barlow',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;}
+
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center,#0d1f3c 0%,#0a1628 100%);}
+.login-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,162,39,.25);
+  border-radius:12px;padding:50px 44px;width:100%;max-width:440px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:4px;color:var(--gold);text-align:center;}
+.login-sub{font-size:.72rem;color:var(--gray);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:8px;}
+.login-badge{display:inline-block;background:rgba(232,93,4,.15);border:1px solid rgba(232,93,4,.3);
+  color:var(--orange);font-size:.68rem;letter-spacing:2px;padding:4px 12px;border-radius:100px;
+  text-transform:uppercase;font-weight:700;margin:16px auto 28px;display:block;text-align:center;width:fit-content;margin:12px auto 28px;}
+.flabel{font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);font-weight:600;margin-bottom:7px;display:block;}
+.finput,.fselect,.ftextarea{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:5px;padding:12px 14px;color:var(--white);font-family:'Barlow',sans-serif;
+  font-size:.9rem;outline:none;transition:border-color .3s;margin-bottom:14px;}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--gold);}
+.fselect{appearance:none;cursor:pointer;} option{background:var(--navy-mid);}
+.ftextarea{resize:vertical;min-height:80px;margin-bottom:0;}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  color:var(--navy);border:none;border-radius:6px;font-family:'Barlow',sans-serif;
+  font-weight:700;font-size:.9rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s;margin-top:4px;}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(201,162,39,.4);}
+.login-error{color:#f87171;font-size:.82rem;margin-top:10px;display:none;text-align:center;}
+
+/* SHELL */
+#adminApp{display:none;min-height:100vh;}
+.topbar{background:rgba(10,22,40,.98);border-bottom:1px solid rgba(201,162,39,.2);
+  padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.topbar-brand{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;color:var(--gold);}
+.topbar-sub{font-size:.65rem;color:var(--gray);letter-spacing:1.5px;}
+.topbar-right{display:flex;align-items:center;gap:14px;}
+.topbar-badge{background:rgba(232,93,4,.15);border:1px solid rgba(232,93,4,.3);color:var(--orange);
+  font-size:.68rem;letter-spacing:1.5px;padding:4px 12px;border-radius:100px;font-weight:700;text-transform:uppercase;}
+.logout-btn{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;
+  padding:7px 16px;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;
+  letter-spacing:1px;transition:all .25s;font-family:'Barlow',sans-serif;}
+.logout-btn:hover{background:rgba(239,68,68,.2);}
+
+.admin-body{display:flex;min-height:calc(100vh - 64px);}
+.sidebar{width:230px;background:rgba(13,31,60,.8);border-right:1px solid rgba(255,255,255,.06);
+  padding:24px 12px;flex-shrink:0;}
+.sidebar-label{font-size:.65rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gray);
+  padding:0 12px;margin-bottom:10px;margin-top:20px;}
+.sidebar-label:first-child{margin-top:0;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;
+  cursor:pointer;transition:all .2s;font-size:.88rem;font-weight:500;color:var(--gray-light);
+  border:1px solid transparent;margin-bottom:2px;}
+.sidebar-item:hover{background:rgba(255,255,255,.05);color:var(--white);}
+.sidebar-item.active{background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.25);color:var(--gold-light);}
+
+.main{flex:1;padding:32px 36px;overflow-y:auto;}
+.tab-panel{display:none;} .tab-panel.active{display:block;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;color:var(--gold);margin-bottom:4px;}
+.page-sub{font-size:.85rem;color:var(--gray);margin-bottom:24px;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.stat-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:20px 18px;}
+.stat-card-num{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;line-height:1;}
+.stat-card-label{font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:6px;}
+
+/* CARD & TABLE */
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;margin-bottom:24px;}
+.card-header{padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-light);}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:11px 16px;text-align:left;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gray);background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.06);white-space:nowrap;}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .2s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.03);}
+td{padding:13px 16px;font-size:.88rem;vertical-align:middle;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;
+  font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;}
+.b-transit  {background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);}
+.b-delivered{background:rgba(34,197,94,.12); color:#4ade80;border:1px solid rgba(34,197,94,.3);}
+.b-pending  {background:rgba(148,163,184,.12);color:#94a3b8;border:1px solid rgba(148,163,184,.3);}
+.b-customs  {background:rgba(232,93,4,.12);  color:#f97316;border:1px solid rgba(232,93,4,.3);}
+.bdot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;cursor:pointer;
+  font-family:'Barlow',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:1px;border:none;transition:all .25s;}
+.btn-gold  {background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 5px 15px rgba(201,162,39,.35);}
+.btn-outline{background:transparent;border:1px solid rgba(255,255,255,.15);color:var(--gray-light);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-red  {background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;}
+.btn-red:hover{background:rgba(239,68,68,.2);}
+.btn-sm{padding:5px 10px;font-size:.75rem;}
+
+/* MODAL */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(4px);z-index:1000;align-items:flex-start;justify-content:center;padding:30px 20px;overflow-y:auto;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--navy-mid);border:1px solid rgba(201,162,39,.2);border-radius:12px;
+  width:100%;max-width:700px;box-shadow:0 40px 100px rgba(0,0,0,.6);margin:auto;}
+.modal-header{padding:22px 26px;border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;
+  background:var(--navy-mid);z-index:2;border-radius:12px 12px 0 0;}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-light);}
+.modal-close{background:none;border:none;color:var(--gray);font-size:1.4rem;cursor:pointer;padding:4px;transition:color .2s;}
+.modal-close:hover{color:var(--white);}
+.modal-body{padding:26px;}
+.modal-footer{padding:18px 26px;border-top:1px solid rgba(255,255,255,.07);display:flex;gap:10px;justify-content:flex-end;}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-group{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+.form-group.full{grid-column:1/-1;}
+
+/* TIMELINE BUILDER */
+.tl-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:6px;padding:14px;margin-bottom:10px;position:relative;}
+.tl-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+.tl-row.three{grid-template-columns:1fr 1fr 1fr;}
+.tl-remove{position:absolute;top:10px;right:10px;background:none;border:none;
+  color:var(--gray);cursor:pointer;font-size:1rem;transition:color .2s;}
+.tl-remove:hover{color:#f87171;}
+.add-step-btn{width:100%;padding:10px;background:rgba(255,255,255,.03);
+  border:1px dashed rgba(255,255,255,.15);border-radius:6px;color:var(--gray);
+  cursor:pointer;font-family:'Barlow',sans-serif;font-size:.85rem;transition:all .2s;text-align:center;}
+.add-step-btn:hover{border-color:var(--gold);color:var(--gold-light);background:rgba(201,162,39,.04);}
+.check-row{display:flex;align-items:center;gap:8px;}
+.check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;}
+.check-row label{font-size:.82rem;color:var(--gray-light);cursor:pointer;}
+
+/* SUPABASE CONFIG BOX */
+.config-box{background:rgba(201,162,39,.06);border:1px solid rgba(201,162,39,.2);
+  border-radius:8px;padding:20px 22px;margin-bottom:24px;}
+.config-box h4{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.config-box p{font-size:.83rem;color:var(--gray-light);line-height:1.7;margin-bottom:10px;}
+.config-box code{background:rgba(0,0,0,.3);padding:2px 7px;border-radius:3px;
+  font-size:.8rem;color:var(--gold-light);font-family:monospace;}
+.config-connected{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25);}
+.config-connected h4{color:#4ade80;}
+
+/* SEARCH */
+.search-bar{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:6px;padding:10px 16px;color:var(--white);font-family:'Barlow',sans-serif;
+  font-size:.88rem;outline:none;transition:border-color .3s;width:260px;}
+.search-bar:focus{border-color:var(--gold);}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:60px 20px;color:var(--gray);}
+.empty-state .ei{font-size:3rem;margin-bottom:12px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;z-index:9999;
+  background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);
+  color:#4ade80;padding:13px 20px;border-radius:8px;font-weight:600;font-size:.88rem;
+  transform:translateY(80px);opacity:0;transition:all .35s ease;max-width:340px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.error{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.35);color:#f87171;}
+
+/* SPINNER */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.2);
+  border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* SETUP STEPS */
+.setup-step{display:flex;gap:16px;padding:18px;background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.06);border-radius:8px;margin-bottom:12px;}
+.setup-num{width:32px;height:32px;border-radius:50%;background:var(--gold);color:var(--navy);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0;}
+.setup-content h4{font-size:.9rem;font-weight:600;margin-bottom:6px;color:var(--white);}
+.setup-content p{font-size:.82rem;color:var(--gray);line-height:1.6;}
+.setup-content code{background:rgba(0,0,0,.3);padding:2px 6px;border-radius:3px;
+  color:var(--gold-light);font-family:monospace;font-size:.78rem;}
+.sql-block{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);border-radius:6px;
+  padding:14px 16px;margin-top:10px;font-family:monospace;font-size:.78rem;
+  color:#a5f3fc;line-height:1.7;overflow-x:auto;white-space:pre;}
+.copy-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:var(--gray-light);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:.72rem;
+  font-family:'Barlow',sans-serif;transition:all .2s;margin-left:8px;}
+.copy-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+@media(max-width:768px){
+  .sidebar{display:none;} .main{padding:20px 16px;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .tl-row,.tl-row.three{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-title">MAXXS GLOBAL</div>
+    <div class="login-sub">Shipment Admin Panel</div>
+    <span class="login-badge">🔐 Authorised Access Only</span>
+    <label class="flabel">Username</label>
+    <input type="text" class="finput" id="loginUser" placeholder="Enter username" onkeydown="if(event.key==='Enter')doLogin()">
+    <label class="flabel">Password</label>
+    <input type="password" class="finput" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Login →</button>
+    <div class="login-error" id="loginError">❌ Invalid username or password</div>
+    
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="adminApp">
+  <div class="topbar">
+    <div>
+      <div class="topbar-brand">MAXXS GLOBAL</div>
+      <div class="topbar-sub">Admin Panel · Shipment Management</div>
+    </div>
+    <div class="topbar-right">
+      <span id="dbStatus" class="topbar-badge">⚪ Not Connected</span>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+    <div class="sidebar">
+      <div class="sidebar-label">Main</div>
+      <div class="sidebar-item active" onclick="showTab('dashboard',this)">📊 Dashboard</div>
+      <div class="sidebar-item" onclick="showTab('shipments',this)">📦 All Shipments</div>
+      <div class="sidebar-item" onclick="showTab('add',this)">➕ Add Shipment</div>
+      <div class="sidebar-item" onclick="showTab('enquiries',this)">✉️ Enquiries</div>
+      <div class="sidebar-label">Config</div>
+      <div class="sidebar-item" onclick="showTab('setup',this)">🗄️ Database Setup</div>
+      <div class="sidebar-item" onclick="showTab('settings',this)">⚙️ Settings</div>
+    </div>
+
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div class="tab-panel active" id="tab-dashboard">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Live overview of all MAXXS GLOBAL shipments</div>
+        <div id="dbWarning"></div>
+        <div class="stats-row" id="dashStats">
+          <div class="stat-card"><div class="stat-card-num" style="color:var(--gold)">—</div><div class="stat-card-label">Total</div></div>
+          <div class="stat-card"><div class="stat-card-num" style="color:#fbbf24">—</div><div class="stat-card-label">In Transit</div></div>
+          <div class="stat-card"><div class="stat-card-num" style="color:#4ade80">—</div><div class="stat-card-label">Delivered</div></div>
+          <div class="stat-card"><div class="stat-card-num" style="color:#f97316">—</div><div class="stat-card-label">Pending / Customs</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Shipments</span>
+            <button class="btn btn-gold" onclick="showTab('add',document.querySelectorAll('.sidebar-item')[2])">+ Add New</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tracking ID</th><th>Cargo</th><th>Mode</th><th>Status</th><th>ETA</th><th>Actions</th></tr></thead>
+              <tbody id="dashTable"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray)"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALL SHIPMENTS -->
+      <div class="tab-panel" id="tab-shipments">
+        <div class="page-title">All Shipments</div>
+        <div class="page-sub">Search, edit or delete any shipment from the database</div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
+          <input class="search-bar" type="text" id="searchBar" placeholder="🔍  Search by ID or cargo..." oninput="renderShipmentsTable()">
+          <button class="btn btn-gold" onclick="showTab('add',document.querySelectorAll('.sidebar-item')[2])">+ Add Shipment</button>
+          <button class="btn btn-outline" onclick="loadAllShipments()">↻ Refresh</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tracking ID</th><th>Cargo</th><th>Mode</th><th>Status</th><th>ETA</th><th>Steps</th><th>Updated</th><th>Actions</th></tr></thead>
+              <tbody id="shipmentsTable"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray)"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD SHIPMENT -->
+      <div class="tab-panel" id="tab-add">
+        <div class="page-title" id="addFormTitle">Add New Shipment</div>
+        <div class="page-sub">Fill in all details. Customers will see this on the website when they enter their Tracking ID.</div>
+        <div class="card" style="overflow:visible">
+          <div style="padding:28px">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="flabel">Tracking ID *</label>
+                <input class="finput" id="fId" placeholder="e.g. MG-2026-00199" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;margin:0">
+              </div>
+              <div class="form-group">
+                <label class="flabel">Status *</label>
+                <select class="fselect" id="fStatus" style="margin:0">
+                  <option value="Pending">⚪ Pending</option>
+                  <option value="In Transit" selected>🟡 In Transit</option>
+                  <option value="At Customs">🟠 At Customs</option>
+                  <option value="Out for Delivery">🔵 Out for Delivery</option>
+                  <option value="Delivered">🟢 Delivered</option>
+                  <option value="On Hold">🔴 On Hold</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="flabel">Cargo Description *</label>
+                <input class="finput" id="fCargo" placeholder="e.g. Indian Pulses (20MT)" style="margin:0">
+              </div>
+              <div class="form-group">
+                <label class="flabel">Transport Mode *</label>
+                <select class="fselect" id="fMode" style="margin:0">
+                  <option>Sea Freight – FCL</option>
+                  <option>Sea Freight – LCL</option>
+                  <option>Air Freight</option>
+                  <option>Multimodal</option>
+                  <option>Road Freight</option>
+                  <option>Rail Freight</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column:1/-1">
+                <label class="flabel">ETA / Delivery Date *</label>
+                <input class="finput" id="fEta" placeholder="e.g. 25 May 2026  or  Delivered 10 May 2026" style="margin:0">
+              </div>
+              <div class="form-group" style="grid-column:1/-1">
+                <label class="flabel">Customer Name (optional)</label>
+                <input class="finput" id="fCustomer" placeholder="e.g. Al Noor Trading LLC" style="margin:0">
+              </div>
+              <div class="form-group" style="grid-column:1/-1">
+                <label class="flabel">Origin → Destination</label>
+                <input class="finput" id="fRoute" placeholder="e.g. Mumbai, India → Jebel Ali, Dubai" style="margin:0">
+              </div>
+            </div>
+
+            <div style="margin-top:20px;margin-bottom:14px">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin-bottom:6px">
+                📍 Journey Timeline Steps
+              </div>
+              <p style="font-size:.78rem;color:var(--gray);margin-bottom:14px">Add steps in order. Tick <strong style="color:var(--white)">Completed ✅</strong> for past steps and <strong style="color:var(--white)">Current 📍</strong> for the one happening right now.</p>
+              <div id="timelineBuilder"></div>
+              <button class="add-step-btn" onclick="addStep()">＋ Add Step</button>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:24px;justify-content:flex-end;flex-wrap:wrap;">
+              <button class="btn btn-outline" onclick="clearForm()">Clear</button>
+              <button class="btn btn-gold" id="saveBtn" onclick="saveShipmentForm()">💾 Save to Database</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENQUIRIES -->
+      <div class="tab-panel" id="tab-enquiries">
+        <div class="page-title">Enquiries</div>
+        <div class="page-sub">Contact form submissions from the website</div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
+          <input class="search-bar" type="text" id="enqSearchBar" placeholder="🔍  Search by name, email or message..." oninput="renderEnquiriesTable()">
+          <button class="btn btn-outline" onclick="loadAllEnquiries()">↻ Refresh</button>
+        </div>
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr)" id="enqStats">
+          <div class="stat-card"><div class="stat-card-num" style="color:var(--gold)">—</div><div class="stat-card-label">Total</div></div>
+          <div class="stat-card"><div class="stat-card-num" style="color:#f97316">—</div><div class="stat-card-label">New</div></div>
+          <div class="stat-card"><div class="stat-card-num" style="color:#4ade80">—</div><div class="stat-card-label">Replied</div></div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Service</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="enquiriesTable"><tr><td colspan="9" style="text-align:center;padding:40px;color:var(--gray)"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATABASE SETUP -->
+      <div class="tab-panel" id="tab-setup">
+        <div class="page-title">Database Setup</div>
+        <div class="page-sub">Connect to Supabase (free PostgreSQL database) — takes about 5 minutes</div>
+
+        <div class="config-box" id="connectionStatus">
+          <h4>⚪ Database Not Connected</h4>
+          <p>Enter your Supabase credentials below to connect. Once connected, all shipment data is stored in a real database and works across all devices worldwide.</p>
+        </div>
+
+        <div class="card" style="overflow:visible">
+          <div class="card-header"><span class="card-title">🔑 Supabase Credentials</span></div>
+          <div style="padding:24px">
+            <div class="form-group">
+              <label class="flabel">Supabase Project URL</label>
+              <input class="finput" id="cfgUrl" placeholder="https://xxxxxxxxxx.supabase.co" style="margin:0">
+            </div>
+            <div class="form-group" style="margin-top:14px">
+              <label class="flabel">Supabase Anon Public Key</label>
+              <input class="finput" id="cfgKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="margin:0">
+            </div>
+            <div style="display:flex;gap:10px;margin-top:18px">
+              <button class="btn btn-gold" onclick="testAndSaveConnection()">🔌 Test & Save Connection</button>
+              <button class="btn btn-outline" onclick="clearConnection()">Clear Credentials</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">📋 Step-by-Step Setup Guide</span></div>
+          <div style="padding:24px">
+            <div class="setup-step">
+              <div class="setup-num">1</div>
+              <div class="setup-content">
+                <h4>Create a free Supabase account</h4>
+                <p>Go to <strong style="color:var(--gold-light)">supabase.com</strong> → Sign up free → Create a new project → Choose a region close to your customers (e.g. Singapore for Middle East/Asia).</p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="setup-num">2</div>
+              <div class="setup-content">
+                <h4>Create the shipments table</h4>
+                <p>In your Supabase dashboard → go to <code>SQL Editor</code> → paste and run this SQL:</p>
+                <div style="display:flex;align-items:center;margin-top:8px">
+                  <span style="font-size:.72rem;color:var(--gray)">SQL to create table</span>
+                  <button class="copy-btn" onclick="copySQL()">Copy SQL</button>
+                </div>
+                <div class="sql-block" id="sqlBlock">CREATE TABLE shipments (
+  id              BIGSERIAL PRIMARY KEY,
+  tracking_id     TEXT UNIQUE NOT NULL,
+  status          TEXT NOT NULL DEFAULT 'Pending',
+  status_class    TEXT NOT NULL DEFAULT 'status-pending',
+  cargo           TEXT NOT NULL,
+  mode            TEXT NOT NULL,
+  eta             TEXT NOT NULL,
+  customer_name   TEXT,
+  route           TEXT,
+  timeline        JSONB NOT NULL DEFAULT '[]',
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Allow public read (customers tracking shipments)
+ALTER TABLE shipments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read shipments"
+  ON shipments FOR SELECT USING (true);
+
+-- Allow authenticated users to write (admin panel)
+CREATE POLICY "Service role can do everything"
+  ON shipments FOR ALL USING (true);
+
+-- Auto-update updated_at
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_updated_at
+  BEFORE UPDATE ON shipments
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();</div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="setup-num">2b</div>
+              <div class="setup-content">
+                <h4>Create the enquiries table (for the contact form)</h4>
+                <p>In the same <code>SQL Editor</code>, also run this to enable enquiries from the website contact form:</p>
+                <div style="display:flex;align-items:center;margin-top:8px">
+                  <span style="font-size:.72rem;color:var(--gray)">SQL for enquiries table</span>
+                  <button class="copy-btn" onclick="copyEnqSQL()">Copy SQL</button>
+                </div>
+                <div class="sql-block" id="enqSqlBlock">CREATE TABLE IF NOT EXISTS enquiries (
+  id         BIGSERIAL PRIMARY KEY,
+  name       TEXT NOT NULL,
+  email      TEXT NOT NULL,
+  phone      TEXT,
+  message    TEXT NOT NULL,
+  status     TEXT NOT NULL DEFAULT 'New',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Allow anyone to submit a contact form
+ALTER TABLE enquiries ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow anon insert on enquiries"
+  ON enquiries FOR INSERT TO anon WITH CHECK (true);
+
+-- Allow admin (service role / anon key) to read and update
+CREATE POLICY "Allow read enquiries"
+  ON enquiries FOR SELECT USING (true);
+CREATE POLICY "Allow update enquiries"
+  ON enquiries FOR UPDATE USING (true);
+CREATE POLICY "Allow delete enquiries"
+  ON enquiries FOR DELETE USING (true);</div>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="setup-num">3</div>
+              <div class="setup-content">
+                <h4>Get your API credentials</h4>
+                <p>In Supabase → <code>Project Settings</code> → <code>API</code> → copy:<br>
+                • <strong style="color:var(--gold-light)">Project URL</strong> (e.g. https://abcdef.supabase.co)<br>
+                • <strong style="color:var(--gold-light)">anon public</strong> key (the long JWT token)</p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="setup-num">4</div>
+              <div class="setup-content">
+                <h4>Paste credentials above and click "Test & Save Connection"</h4>
+                <p>The admin panel and customer website will then use your live database automatically.</p>
+              </div>
+            </div>
+            <div class="setup-step">
+              <div class="setup-num">5</div>
+              <div class="setup-content">
+                <h4>Update the customer website file</h4>
+                <p>Open <code>maxxs-global-website.html</code> → find <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> → paste the same values. That's it — both files now share the same live database.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="tab-panel" id="tab-settings">
+        <div class="page-title">Settings</div>
+        <div class="page-sub">Admin credentials and preferences</div>
+        <div class="card" style="max-width:500px">
+          <div class="card-header"><span class="card-title">🔐 Change Login Credentials</span></div>
+          <div style="padding:24px">
+            <div class="form-group">
+              <label class="flabel">New Username</label>
+              <input class="finput" id="newUser" placeholder="Enter new username" style="margin:0">
+            </div>
+            <div class="form-group" style="margin-top:14px">
+              <label class="flabel">New Password</label>
+              <input class="finput" type="password" id="newPass" placeholder="Enter new password" style="margin:0">
+            </div>
+            <div class="form-group" style="margin-top:14px">
+              <label class="flabel">Confirm Password</label>
+              <input class="finput" type="password" id="newPass2" placeholder="Confirm new password" style="margin:0">
+            </div>
+            <button class="btn btn-gold" onclick="changePassword()" style="width:100%;justify-content:center;padding:13px;margin-top:18px">Save Credentials</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /admin-body -->
+</div><!-- /adminApp -->
+
+<!-- EDIT MODAL -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="editModalTitle">✏️ Edit Shipment</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="flabel">Tracking ID</label>
+          <input class="finput" id="eFId" disabled style="opacity:.6;margin:0">
+        </div>
+        <div class="form-group">
+          <label class="flabel">Status</label>
+          <select class="fselect" id="eFStatus" style="margin:0">
+            <option value="Pending">⚪ Pending</option>
+            <option value="In Transit">🟡 In Transit</option>
+            <option value="At Customs">🟠 At Customs</option>
+            <option value="Out for Delivery">🔵 Out for Delivery</option>
+            <option value="Delivered">🟢 Delivered</option>
+            <option value="On Hold">🔴 On Hold</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="flabel">Cargo</label>
+          <input class="finput" id="eFCargo" style="margin:0">
+        </div>
+        <div class="form-group">
+          <label class="flabel">Mode</label>
+          <select class="fselect" id="eFMode" style="margin:0">
+            <option>Sea Freight – FCL</option><option>Sea Freight – LCL</option>
+            <option>Air Freight</option><option>Multimodal</option>
+            <option>Road Freight</option><option>Rail Freight</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="flabel">ETA</label>
+          <input class="finput" id="eFEta" style="margin:0">
+        </div>
+        <div class="form-group full">
+          <label class="flabel">Customer Name</label>
+          <input class="finput" id="eFCustomer" style="margin:0">
+        </div>
+        <div class="form-group full">
+          <label class="flabel">Route</label>
+          <input class="finput" id="eFRoute" style="margin:0">
+        </div>
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin:16px 0 10px">📍 Timeline Steps</div>
+      <div id="editTimelineBuilder"></div>
+      <button class="add-step-btn" onclick="addEditStep()">＋ Add Step</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" id="editSaveBtn" onclick="saveEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+// ════════════════════════════════════════
+//  CONFIG & STATE
+// ════════════════════════════════════════
+let SB_URL = '';
+let SB_KEY = '';
+let allShipments = [];
+let editingId    = null;
+let stepCount    = 0;
+let editStepCount= 0;
+
+const DEFAULT_CREDS = { user:'admin', pass:'maxxs2026' };
+
+function getCreds() {
+  return {
+    user: localStorage.getItem('mg_user') || DEFAULT_CREDS.user,
+    pass: localStorage.getItem('mg_pass') || DEFAULT_CREDS.pass
+  };
+}
+function loadConfig() {
+  SB_URL = localStorage.getItem('mg_sb_url') || '';
+  SB_KEY = localStorage.getItem('mg_sb_key') || '';
+}
+
+// ════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  const c = getCreds();
+  if (u === c.user && p === c.pass) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    loadConfig();
+    updateDbStatus();
+    loadAllShipments();
+    initAddForm();
+    populateSetupFields();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+function doLogout() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminApp').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+}
+function changePassword() {
+  const u  = document.getElementById('newUser').value.trim();
+  const p  = document.getElementById('newPass').value.trim();
+  const p2 = document.getElementById('newPass2').value.trim();
+  if (!u || !p)  { showToast('Fill in username and password', true); return; }
+  if (p !== p2)  { showToast('Passwords do not match', true); return; }
+  localStorage.setItem('mg_user', u);
+  localStorage.setItem('mg_pass', p);
+  showToast('✅ Credentials updated!');
+  document.getElementById('newUser').value = '';
+  document.getElementById('newPass').value = '';
+  document.getElementById('newPass2').value = '';
+}
+
+// ════════════════════════════════════════
+//  SUPABASE API
+// ════════════════════════════════════════
+function headers(extra = {}) {
+  return {
+    'apikey': SB_KEY,
+    'Authorization': `Bearer ${SB_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation',
+    ...extra
+  };
+}
+
+async function sbGet(table, params = '') {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`, { headers: headers() });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbPost(table, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
+    method: 'POST', headers: headers(), body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbPatch(table, match, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?${match}`, {
+    method: 'PATCH', headers: headers(), body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbDelete(table, match) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?${match}`, {
+    method: 'DELETE', headers: headers()
+  });
+  if (!r.ok) throw new Error(await r.text());
+}
+
+// ════════════════════════════════════════
+//  CONNECTION
+// ════════════════════════════════════════
+function updateDbStatus() {
+  const el = document.getElementById('dbStatus');
+  if (SB_URL && SB_KEY) {
+    el.textContent = '🟢 Database Connected';
+    el.style.background = 'rgba(34,197,94,.15)';
+    el.style.borderColor = 'rgba(34,197,94,.3)';
+    el.style.color = '#4ade80';
+  } else {
+    el.textContent = '⚪ Not Connected';
+    el.style.background = '';
+    el.style.borderColor = '';
+    el.style.color = '';
+  }
+}
+
+function populateSetupFields() {
+  document.getElementById('cfgUrl').value = SB_URL;
+  document.getElementById('cfgKey').value = SB_KEY;
+  updateConnectionStatusBox();
+}
+
+function updateConnectionStatusBox() {
+  const box = document.getElementById('connectionStatus');
+  if (SB_URL && SB_KEY) {
+    box.className = 'config-box config-connected';
+    box.innerHTML = `<h4>🟢 Database Connected</h4><p>Connected to: <code>${SB_URL}</code><br>All shipment data is live and synced across all devices.</p>`;
+  } else {
+    box.className = 'config-box';
+    box.innerHTML = `<h4>⚪ Database Not Connected</h4><p>Enter your Supabase credentials below to connect. Once connected, shipment data works across all devices worldwide.</p>`;
+  }
+}
+
+async function testAndSaveConnection() {
+  const url = document.getElementById('cfgUrl').value.trim().replace(/\/$/, '');
+  const key = document.getElementById('cfgKey').value.trim();
+  if (!url || !key) { showToast('Enter URL and Key', true); return; }
+  showToast('🔌 Testing connection...');
+  try {
+    const r = await fetch(`${url}/rest/v1/shipments?limit=1`, {
+      headers: { 'apikey': key, 'Authorization': `Bearer ${key}` }
+    });
+    if (!r.ok) {
+      const txt = await r.text();
+      if (txt.includes('does not exist') || txt.includes('relation')) {
+        showToast('⚠️ Table not found — run the SQL from Step 2 first', true); return;
+      }
+      throw new Error(txt);
+    }
+    SB_URL = url; SB_KEY = key;
+    localStorage.setItem('mg_sb_url', url);
+    localStorage.setItem('mg_sb_key', key);
+    updateDbStatus();
+    updateConnectionStatusBox();
+    showToast('✅ Connected successfully! Database is live.');
+    loadAllShipments();
+  } catch(e) {
+    showToast('❌ Connection failed: ' + e.message, true);
+  }
+}
+function clearConnection() {
+  localStorage.removeItem('mg_sb_url');
+  localStorage.removeItem('mg_sb_key');
+  SB_URL = ''; SB_KEY = '';
+  document.getElementById('cfgUrl').value = '';
+  document.getElementById('cfgKey').value = '';
+  updateDbStatus();
+  updateConnectionStatusBox();
+  showToast('Credentials cleared');
+}
+
+// ════════════════════════════════════════
+//  LOAD DATA
+// ════════════════════════════════════════
+async function loadAllShipments() {
+  if (!SB_URL || !SB_KEY) {
+    showDbWarning();
+    allShipments = [];
+    renderDashboard([]);
+    renderShipmentsTable();
+    return;
+  }
+  try {
+    const rows = await sbGet('shipments', 'order=created_at.desc');
+    allShipments = rows;
+    allShipments = rows;
+    renderDashboard(rows);
+    renderShipmentsTable();
+    hideDbWarning();
+  } catch(e) {
+    showToast('Failed to load: ' + e.message, true);
+    allShipments = [];
+    renderDashboard([]);
+    renderShipmentsTable();
+  }
+}
+
+function showDbWarning() {
+  document.getElementById('dbWarning').innerHTML = `
+    <div style="background:rgba(232,93,4,.1);border:1px solid rgba(232,93,4,.3);border-radius:8px;
+      padding:14px 18px;margin-bottom:20px;font-size:.85rem;color:#f97316">
+      ⚠️ <strong>Database not connected.</strong> 
+      <a href="#" onclick="showTab('setup',document.querySelectorAll('.sidebar-item')[3]);return false" 
+        style="color:var(--gold-light);text-decoration:underline">Go to Database Setup →</a>
+    </div>`;
+}
+function hideDbWarning() {
+  document.getElementById('dbWarning').innerHTML = '';
+}
+
+// ════════════════════════════════════════
+//  TABS
+// ════════════════════════════════════════
+function showTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'shipments') renderShipmentsTable();
+  if (name === 'add')       { clearForm(); }
+  if (name === 'setup')     populateSetupFields();
+  if (name === 'enquiries') loadAllEnquiries();
+}
+
+// ════════════════════════════════════════
+//  DASHBOARD
+// ════════════════════════════════════════
+function renderDashboard(rows) {
+  const transit   = rows.filter(r => ['In Transit','Out for Delivery'].includes(r.status)).length;
+  const delivered = rows.filter(r => r.status === 'Delivered').length;
+  const other     = rows.filter(r => !['In Transit','Out for Delivery','Delivered'].includes(r.status)).length;
+  document.getElementById('dashStats').innerHTML = `
+    <div class="stat-card"><div class="stat-card-num" style="color:var(--gold)">${rows.length}</div><div class="stat-card-label">Total Shipments</div></div>
+    <div class="stat-card"><div class="stat-card-num" style="color:#fbbf24">${transit}</div><div class="stat-card-label">In Transit</div></div>
+    <div class="stat-card"><div class="stat-card-num" style="color:#4ade80">${delivered}</div><div class="stat-card-label">Delivered</div></div>
+    <div class="stat-card"><div class="stat-card-num" style="color:#f97316">${other}</div><div class="stat-card-label">Pending / Customs</div></div>`;
+
+  const tbody = document.getElementById('dashTable');
+  const recent = rows.slice(0,10);
+  if (!recent.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="ei">📭</div>
+      <p>No shipments yet. <a href="#" onclick="showTab('add',document.querySelectorAll('.sidebar-item')[2]);return false" style="color:var(--gold-light)">Add one →</a></p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = recent.map(s => `
+    <tr>
+      <td><strong style="color:var(--gold-light);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px">${s.tracking_id}</strong></td>
+      <td>${s.cargo}</td>
+      <td style="color:var(--gray);font-size:.82rem">${s.mode}</td>
+      <td>${badgeMk(s.status)}</td>
+      <td style="color:var(--gray);font-size:.82rem">${s.eta}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="openEdit('${s.tracking_id}')">✏️ Edit</button>
+        <button class="btn btn-red btn-sm" style="margin-left:4px" onclick="deleteShipment('${s.tracking_id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+// ════════════════════════════════════════
+//  SHIPMENTS TABLE
+// ════════════════════════════════════════
+function renderShipmentsTable() {
+  const q = (document.getElementById('searchBar')?.value || '').toLowerCase();
+  const rows = allShipments.filter(s =>
+    !q || s.tracking_id.toLowerCase().includes(q) || (s.cargo||'').toLowerCase().includes(q) || (s.customer_name||'').toLowerCase().includes(q)
+  );
+  const tbody = document.getElementById('shipmentsTable');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="ei">🔍</div><p>No results found.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(s => `
+    <tr>
+      <td><strong style="color:var(--gold-light);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px">${s.tracking_id}</strong>${s.customer_name ? `<br><span style="font-size:.73rem;color:var(--gray)">${s.customer_name}</span>` : ''}</td>
+      <td>${s.cargo}</td>
+      <td style="color:var(--gray);font-size:.82rem">${s.mode}</td>
+      <td>${badgeMk(s.status)}</td>
+      <td style="color:var(--gray);font-size:.82rem">${s.eta}</td>
+      <td style="color:var(--gray);font-size:.82rem">${Array.isArray(s.timeline) ? s.timeline.length : 0} steps</td>
+      <td style="color:var(--gray);font-size:.75rem">${s.updated_at ? new Date(s.updated_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-outline btn-sm" onclick="openEdit('${s.tracking_id}')">✏️ Edit</button>
+        <button class="btn btn-red btn-sm" style="margin-left:4px" onclick="deleteShipment('${s.tracking_id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+function badgeMk(s) {
+  const cls = s==='Delivered'?'b-delivered':s==='In Transit'||s==='Out for Delivery'?'b-transit':s==='At Customs'?'b-customs':'b-pending';
+  return `<span class="badge ${cls}"><span class="bdot"></span>${s}</span>`;
+}
+function statusClass(s) {
+  if (s==='Delivered') return 'status-delivered';
+  if (s==='In Transit'||s==='Out for Delivery') return 'status-transit';
+  if (s==='At Customs') return 'status-customs';
+  return 'status-pending';
+}
+
+// ════════════════════════════════════════
+//  TIMELINE BUILDER
+// ════════════════════════════════════════
+function addStep(ev='', loc='', time='', done=false, active=false, container='timelineBuilder') {
+  const i  = container === 'timelineBuilder' ? stepCount++ : editStepCount++;
+  const pid = container === 'timelineBuilder' ? `s${i}` : `es${i}`;
+  const el = document.createElement('div');
+  el.className = 'tl-item'; el.id = 'tli_' + pid;
+  el.innerHTML = `
+    <button class="tl-remove" onclick="document.getElementById('tli_${pid}').remove()">✕</button>
+    <div class="tl-row">
+      <div class="form-group" style="margin:0"><label class="flabel">Event</label>
+        <input class="finput step-event" placeholder="e.g. Vessel Departed" value="${ev}" style="margin:0"></div>
+      <div class="form-group" style="margin:0"><label class="flabel">Location</label>
+        <input class="finput step-location" placeholder="e.g. Mumbai Port" value="${loc}" style="margin:0"></div>
+    </div>
+    <div class="tl-row three" style="margin-top:8px">
+      <div class="form-group" style="margin:0"><label class="flabel">Date / Time</label>
+        <input class="finput step-time" placeholder="e.g. 07 May 2026" value="${time}" style="margin:0"></div>
+      <div class="form-group" style="margin:0;padding-top:22px"><div class="check-row">
+        <input type="checkbox" id="done_${pid}" class="step-done" ${done?'checked':''}>
+        <label for="done_${pid}">Completed ✅</label></div></div>
+      <div class="form-group" style="margin:0;padding-top:22px"><div class="check-row">
+        <input type="checkbox" id="act_${pid}" class="step-active" ${active?'checked':''}>
+        <label for="act_${pid}">Current 📍</label></div></div>
+    </div>`;
+  document.getElementById(container).appendChild(el);
+}
+
+function addEditStep(ev='', loc='', time='', done=false, active=false) {
+  addStep(ev, loc, time, done, active, 'editTimelineBuilder');
+}
+
+function collectSteps(containerId) {
+  return Array.from(document.getElementById(containerId).querySelectorAll('.tl-item')).map(item => ({
+    event:    item.querySelector('.step-event').value.trim(),
+    location: item.querySelector('.step-location').value.trim(),
+    time:     item.querySelector('.step-time').value.trim(),
+    done:     item.querySelector('.step-done').checked,
+    active:   item.querySelector('.step-active').checked,
+  })).filter(s => s.event);
+}
+
+// ════════════════════════════════════════
+//  ADD / SAVE FORM
+// ════════════════════════════════════════
+function initAddForm() {
+  stepCount = 0;
+  ['fId','fCargo','fEta','fCustomer','fRoute'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('fStatus').value = 'In Transit';
+  document.getElementById('fMode').value   = 'Sea Freight – FCL';
+  document.getElementById('timelineBuilder').innerHTML = '';
+  document.getElementById('addFormTitle').textContent = 'Add New Shipment';
+  document.getElementById('saveBtn').textContent = '💾 Save to Database';
+  addStep(); addStep(); addStep();
+}
+function clearForm() { initAddForm(); }
+
+async function saveShipmentForm() {
+  if (!SB_URL || !SB_KEY) {
+    showToast('⚠️ Connect the database first (Database Setup tab)', true); return;
+  }
+  const id       = document.getElementById('fId').value.trim().toUpperCase();
+  const status   = document.getElementById('fStatus').value;
+  const cargo    = document.getElementById('fCargo').value.trim();
+  const mode     = document.getElementById('fMode').value;
+  const eta      = document.getElementById('fEta').value.trim();
+  const customer = document.getElementById('fCustomer').value.trim();
+  const route    = document.getElementById('fRoute').value.trim();
+  if (!id || !cargo || !eta) { showToast('Fill in Tracking ID, Cargo and ETA', true); return; }
+  const timeline = collectSteps('timelineBuilder');
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Saving...';
+  try {
+    // Upsert (insert or update if exists)
+    const existing = await sbGet('shipments', `tracking_id=eq.${encodeURIComponent(id)}`);
+    if (existing.length > 0) {
+      await sbPatch('shipments', `tracking_id=eq.${encodeURIComponent(id)}`, {
+        status, status_class: statusClass(status), cargo, mode, eta, customer_name: customer, route, timeline
+      });
+    } else {
+      await sbPost('shipments', {
+        tracking_id: id, status, status_class: statusClass(status), cargo, mode, eta,
+        customer_name: customer, route, timeline
+      });
+    }
+    showToast(`✅ Shipment ${id} saved!`);
+    clearForm();
+    await loadAllShipments();
+  } catch(e) {
+    showToast('❌ Save failed: ' + e.message, true);
+  } finally {
+    btn.disabled = false; btn.innerHTML = '💾 Save to Database';
+  }
+}
+
+// ════════════════════════════════════════
+//  EDIT
+// ════════════════════════════════════════
+function openEdit(trackingId) {
+  const s = allShipments.find(r => r.tracking_id === trackingId);
+  if (!s) return;
+  editingId     = trackingId;
+  editStepCount = 0;
+  document.getElementById('eFId').value       = trackingId;
+  document.getElementById('eFStatus').value   = s.status;
+  document.getElementById('eFCargo').value    = s.cargo;
+  document.getElementById('eFMode').value     = s.mode;
+  document.getElementById('eFEta').value      = s.eta;
+  document.getElementById('eFCustomer').value = s.customer_name || '';
+  document.getElementById('eFRoute').value    = s.route || '';
+  document.getElementById('editTimelineBuilder').innerHTML = '';
+  const tl = Array.isArray(s.timeline) ? s.timeline : (typeof s.timeline === 'string' ? JSON.parse(s.timeline) : []);
+  tl.forEach(t => addEditStep(t.event, t.location, t.time, t.done, t.active));
+  document.getElementById('editModal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('editModal').classList.remove('open');
+  editingId = null;
+}
+async function saveEdit() {
+  const status   = document.getElementById('eFStatus').value;
+  const cargo    = document.getElementById('eFCargo').value.trim();
+  const mode     = document.getElementById('eFMode').value;
+  const eta      = document.getElementById('eFEta').value.trim();
+  const customer = document.getElementById('eFCustomer').value.trim();
+  const route    = document.getElementById('eFRoute').value.trim();
+  if (!cargo || !eta) { showToast('Fill in Cargo and ETA', true); return; }
+  const timeline = collectSteps('editTimelineBuilder');
+  const btn = document.getElementById('editSaveBtn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Saving...';
+  try {
+    await sbPatch('shipments', `tracking_id=eq.${encodeURIComponent(editingId)}`, {
+      status, status_class: statusClass(status), cargo, mode, eta, customer_name: customer, route, timeline
+    });
+    showToast(`✅ ${editingId} updated!`);
+    closeModal();
+    await loadAllShipments();
+  } catch(e) {
+    showToast('❌ Update failed: ' + e.message, true);
+  } finally {
+    btn.disabled = false; btn.innerHTML = '💾 Save Changes';
+  }
+}
+
+// ════════════════════════════════════════
+//  DELETE
+// ════════════════════════════════════════
+async function deleteShipment(id) {
+  if (!confirm(`Delete shipment ${id}?\n\nThis cannot be undone.`)) return;
+  try {
+    await sbDelete('shipments', `tracking_id=eq.${encodeURIComponent(id)}`);
+    showToast(`🗑️ ${id} deleted`);
+    await loadAllShipments();
+  } catch(e) {
+    showToast('❌ Delete failed: ' + e.message, true);
+  }
+}
+
+// ════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  clearTimeout(t._timer);
+  setTimeout(() => t.classList.add('show'), 10);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3800);
+}
+
+function copySQL() {
+  const sql = document.getElementById('sqlBlock').textContent;
+  navigator.clipboard.writeText(sql).then(() => showToast('✅ SQL copied to clipboard!'));
+}
+
+// Close modal on backdrop click
+document.getElementById('editModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('editModal')) closeModal();
+});
+
+// ════════════════════════════════════════
+//  ENQUIRIES
+// ════════════════════════════════════════
+let allEnquiries = [];
+
+async function loadAllEnquiries() {
+  if (!SB_URL || !SB_KEY) { showToast('⚠️ Connect the database first', true); return; }
+  const tbody = document.getElementById('enquiriesTable');
+  tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--gray)"><div class="spinner"></div></td></tr>`;
+  try {
+    const rows = await sbGet('enquiries', 'order=created_at.desc');
+    allEnquiries = rows;
+    renderEnquiriesTable();
+    renderEnquiryStats(rows);
+  } catch(e) {
+    showToast('❌ Failed to load enquiries: ' + e.message, true);
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray)">Failed to load. Check database connection.</td></tr>`;
+  }
+}
+
+function renderEnquiryStats(rows) {
+  const total   = rows.length;
+  const newCount = rows.filter(r => r.status === 'New').length;
+  const replied  = rows.filter(r => r.status === 'Replied').length;
+  document.getElementById('enqStats').innerHTML = `
+    <div class="stat-card"><div class="stat-card-num" style="color:var(--gold)">${total}</div><div class="stat-card-label">Total</div></div>
+    <div class="stat-card"><div class="stat-card-num" style="color:#f97316">${newCount}</div><div class="stat-card-label">New</div></div>
+    <div class="stat-card"><div class="stat-card-num" style="color:#4ade80">${replied}</div><div class="stat-card-label">Replied</div></div>`;
+}
+
+function renderEnquiriesTable() {
+  const q = (document.getElementById('enqSearchBar')?.value || '').toLowerCase();
+  const rows = allEnquiries.filter(e =>
+    !q || (e.name||'').toLowerCase().includes(q) ||
+          (e.email||'').toLowerCase().includes(q) ||
+          (e.message||'').toLowerCase().includes(q)
+  );
+  const tbody = document.getElementById('enquiriesTable');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="ei">📭</div><p>No enquiries yet.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(e => {
+    const date = e.created_at ? new Date(e.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const statusBadge = e.status === 'Replied'
+      ? `<span class="badge b-delivered"><span class="bdot"></span>Replied</span>`
+      : e.status === 'Archived'
+      ? `<span class="badge b-pending"><span class="bdot"></span>Archived</span>`
+      : `<span class="badge b-customs"><span class="bdot"></span>New</span>`;
+    const msg = (e.message||'').length > 60 ? e.message.substring(0,60) + '…' : (e.message||'—');
+    return `<tr>
+      <td style="color:var(--gray);font-size:.78rem;white-space:nowrap">${date}</td>
+      <td><strong style="color:var(--white)">${e.name||'—'}</strong></td>
+      <td><a href="mailto:${e.email||''}" style="color:var(--gold-light);text-decoration:none">${e.email||'—'}</a></td>
+      <td style="color:var(--gray);font-size:.82rem">${e.phone||'—'}</td>
+      <td style="color:var(--gray-light);font-size:.82rem">${e.company||'—'}</td>
+      <td style="color:var(--gray);font-size:.78rem;white-space:nowrap">${e.service||'—'}</td>
+      <td style="color:var(--gray-light);font-size:.83rem;max-width:240px">${msg}</td>
+      <td>${statusBadge}</td>
+      <td style="white-space:nowrap">
+        <select class="fselect" style="margin:0;padding:5px 8px;font-size:.75rem;width:auto"
+          onchange="updateEnquiryStatus(${e.id}, this.value)">
+          <option ${e.status==='New'?'selected':''}>New</option>
+          <option ${e.status==='Replied'?'selected':''}>Replied</option>
+          <option ${e.status==='Archived'?'selected':''}>Archived</option>
+        </select>
+        <button class="btn btn-red btn-sm" style="margin-left:4px" onclick="deleteEnquiry(${e.id})">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function updateEnquiryStatus(id, status) {
+  try {
+    await sbPatch('enquiries', `id=eq.${id}`, { status });
+    const idx = allEnquiries.findIndex(e => e.id === id);
+    if (idx !== -1) allEnquiries[idx].status = status;
+    renderEnquiryStats(allEnquiries);
+    showToast(`✅ Status updated to "${status}"`);
+  } catch(e) {
+    showToast('❌ Update failed: ' + e.message, true);
+  }
+}
+
+async function deleteEnquiry(id) {
+  if (!confirm('Delete this enquiry?\n\nThis cannot be undone.')) return;
+  try {
+    await sbDelete('enquiries', `id=eq.${id}`);
+    allEnquiries = allEnquiries.filter(e => e.id !== id);
+    renderEnquiriesTable();
+    renderEnquiryStats(allEnquiries);
+    showToast('🗑️ Enquiry deleted');
+  } catch(e) {
+    showToast('❌ Delete failed: ' + e.message, true);
+  }
+}
+
+function copyEnqSQL() {
+  const sql = document.getElementById('enqSqlBlock').textContent;
+  navigator.clipboard.writeText(sql).then(() => showToast('✅ Enquiries SQL copied!'));
+}
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+loadConfig();
+</script>
+</body>
+</html>
